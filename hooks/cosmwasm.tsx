@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { connectKeplr } from 'services/keplr'
 import { SigningCosmWasmClient, CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { SecretNetworkClient } from "secretjs"
 
 export interface ISigningCosmWasmClientContext {
   walletAddress: string
-  client: CosmWasmClient | null
+  client: SecretNetworkClient | null
   signingClient: SigningCosmWasmClient | null
   loading: boolean
   error: any
@@ -16,7 +17,7 @@ const PUBLIC_RPC_ENDPOINT = process.env.NEXT_PUBLIC_CHAIN_RPC_ENDPOINT || ''
 const PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
 
 export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
-  const [client, setClient] = useState<CosmWasmClient | null>(null)
+  const [client, setClient] = useState<SecretNetworkClient | null>(null)
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null)
   const [walletAddress, setWalletAddress] = useState('')
@@ -36,12 +37,22 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
       const offlineSigner = await (window as any).getOfflineSigner(
         PUBLIC_CHAIN_ID
       )
+      // get user address
+      const [{ address }] = await offlineSigner.getAccounts()
+      setWalletAddress(address)
 
       // make client
       setClient(
-        await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
+        await SecretNetworkClient.create({
+          rpcUrl: PUBLIC_RPC_ENDPOINT,
+          wallet: offlineSigner,
+          walletAddress: address,
+          chainId: PUBLIC_CHAIN_ID
+        })
+        // await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
       )
 
+      
       // make client
       setSigningClient(
         await SigningCosmWasmClient.connectWithSigner(
@@ -50,12 +61,8 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
         )
       )
 
-      // get user address
-      const [{ address }] = await offlineSigner.getAccounts()
-      setWalletAddress(address)
-
       setLoading(false)
-    } catch (error) {
+    } catch (error:any) {
       setError(error)
     }
   }

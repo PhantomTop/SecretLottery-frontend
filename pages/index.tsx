@@ -10,13 +10,14 @@ import {
 import { coin } from '@cosmjs/launchpad'
 import { useAlert } from 'react-alert'
 import Emoji from 'components/Emoji'
+import { MsgSend } from 'secretjs'
 
-const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'ujuno'
+const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
 const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
 
 const Home: NextPage = () => {
-  const { walletAddress, signingClient, connectWallet } = useSigningClient()
+  const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
   const [balance, setBalance] = useState('')
   const [cw20Balance, setCw20Balance] = useState('')
   const [walletAmount, setWalletAmount] = useState(0)
@@ -30,7 +31,7 @@ const Home: NextPage = () => {
   const alert = useAlert()
 
   useEffect(() => {
-    if (!signingClient || walletAddress.length === 0) return
+    if (!signingClient || !client || walletAddress.length === 0) return
 
     // Gets native balance (i.e. Juno balance)
     signingClient.getBalance(walletAddress, PUBLIC_STAKING_DENOM).then((response: any) => {
@@ -42,97 +43,181 @@ const Home: NextPage = () => {
       console.log('Error signingClient.getBalance(): ', error)
     })
 
-    // Gets cw20 balance
-    signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
-      balance: { address: walletAddress },
+    client.query.compute.queryContract({
+      address: PUBLIC_TOKEN_SALE_CONTRACT, 
+      query: {total_state: {}},
     }).then((response) => {
-      setCw20Balance(response.balance)
-    }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.queryContractSmart() balance: ', error)
-    })
-  }, [signingClient, walletAddress, loadedAt, alert])
-
-  useEffect(() => {
-    if (!signingClient) return
-
-    // Gets token information
-    signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
-      token_info: {},
-    }).then((response) => {
-      setTokenInfo(response)
-    }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.queryContractSmart() token_info: ', error)
-    })
-  }, [signingClient, alert])
-
-  /**
-   * Calculates and sets the number of tokens given the purchase amount divided by the price
-   */
-   useEffect(() => {
-    if (!signingClient) return
-
-    signingClient.queryContractSmart(PUBLIC_TOKEN_SALE_CONTRACT, {
-      get_info: {},
-    }).then((response) => {
-      const price  = convertMicroDenomToDenom(response.price.amount)
-      console.log("price : " + price) // i.e. 1 POOD token = 1000 uJUNO (micro)
-      setPrice(price)
-      setNumToken(purchaseAmount/price)
+      console.log(response)
+      
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
-    setShowNumToken(!!purchaseAmount)
-  }, [purchaseAmount, signingClient, alert])
+    // // Gets cw20 balance
+    // signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
+    //   balance: { address: walletAddress },
+    // }).then((response) => {
+    //   setCw20Balance(response.balance)
+    // }).catch((error) => {
+    //   alert.error(`Error! ${error.message}`)
+    //   console.log('Error signingClient.queryContractSmart() balance: ', error)
+    // })
+  }, [signingClient, client, walletAddress, loadedAt, alert])
+
+  // useEffect(() => {
+  //   if (!signingClient) return
+
+  //   // Gets token information
+  //   signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
+  //     token_info: {},
+  //   }).then((response) => {
+  //     setTokenInfo(response)
+  //   }).catch((error) => {
+  //     alert.error(`Error! ${error.message}`)
+  //     console.log('Error signingClient.queryContractSmart() token_info: ', error)
+  //   })
+  // }, [signingClient, alert])
+
+  /**
+   * Calculates and sets the number of tokens given the purchase amount divided by the price
+   */
+  //  useEffect(() => {
+  //   if (!signingClient) return
+
+  //   signingClient.queryContractSmart(PUBLIC_TOKEN_SALE_CONTRACT, {
+  //     get_info: {},
+  //   }).then((response) => {
+  //     const price  = convertMicroDenomToDenom(response.price.amount)
+  //     console.log("price : " + price) // i.e. 1 POOD token = 1000 uJUNO (micro)
+  //     setPrice(price)
+  //     setNumToken(purchaseAmount/price)
+  //   }).catch((error) => {
+  //     alert.error(`Error! ${error.message}`)
+  //     console.log('Error signingClient.queryContractSmart() get_info: ', error)
+  //   })
+
+  //   setShowNumToken(!!purchaseAmount)
+  // }, [purchaseAmount, signingClient, alert])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { target: { value } } = event
     setPurchaseAmount(value)
   }
 
+  // const handlePurchase = (event: MouseEvent<HTMLElement>) => {
+  //   if (!signingClient || walletAddress.length === 0) return
+  //   if (!purchaseAmount) {
+  //     alert.error('Please enter the amount you would like to purchase')
+  //     return
+  //   }
+  //   if (purchaseAmount > walletAmount) {
+  //     alert.error(`You do not have enough tokens to make this purchase, maximum you can spend is ${walletAmount}`)
+  //     return
+  //   }
+
+  //   event.preventDefault()
+  //   setLoading(true)
+  //   const defaultFee = {
+  //     amount: [],
+  //     gas: "400000",
+  //   };
+
+
+  //   signingClient?.execute(
+  //     walletAddress, // sender address
+  //     PUBLIC_TOKEN_SALE_CONTRACT, // token sale contract
+  //     { "buy": {
+  //       "denom": "ujunox",
+  //       "price": "100"
+  //     } }, // msg
+  //     defaultFee,
+  //     undefined,
+  //     [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), 'ujunox')]
+  //   ).then((response) => {
+  //     setPurchaseAmount('')
+  //     setLoadedAt(new Date())
+  //     setLoading(false)
+  //     alert.success('Successfully purchased!')
+  //   }).catch((error) => {
+  //     setLoading(false)
+  //     alert.error(`Error! ${error.message}`)
+  //     console.log('Error signingClient?.execute(): ', error)
+  //   })
+  // }
+
   const handlePurchase = (event: MouseEvent<HTMLElement>) => {
-    if (!signingClient || walletAddress.length === 0) return
-    if (!purchaseAmount) {
-      alert.error('Please enter the amount you would like to purchase')
-      return
-    }
-    if (purchaseAmount > walletAmount) {
-      alert.error(`You do not have enough tokens to make this purchase, maximum you can spend is ${walletAmount}`)
-      return
-    }
+    if (!signingClient || !client || walletAddress.length === 0) return
+    // if (!purchaseAmount) {
+    //   alert.error('Please enter the amount you would like to purchase')
+    //   return
+    // }
+    // if (purchaseAmount > walletAmount) {
+    //   alert.error(`You do not have enough tokens to make this purchase, maximum you can spend is ${walletAmount}`)
+    //   return
+    // }
 
     event.preventDefault()
     setLoading(true)
-    const defaultFee = {
-      amount: [],
-      gas: "400000",
-    };
+    
+    // const msg = new MsgSend({
+    //   fromAddress: walletAddress,
+    //   toAddress: bob,
+    //   amount: [{ denom: "uscrt", amount: "1" }],
+    // });
+    
+    // const tx = await secretjs.tx.broadcast([msg], {
+    //   gasLimit: 20_000,
+    //   gasPriceInFeeDenom: 0.25,
+    //   feeDenom: "uscrt",
+    // });
 
-    signingClient?.execute(
-      walletAddress, // sender address
-      PUBLIC_TOKEN_SALE_CONTRACT, // token sale contract
-      { "buy": {
-        "denom": "ujunox",
-        "price": "100"
-      } }, // msg
-      defaultFee,
-      undefined,
-      [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), 'ujunox')]
-    ).then((response) => {
-      setPurchaseAmount('')
-      setLoadedAt(new Date())
+    client?.tx.compute.executeContract({
+      sender: walletAddress,
+      contract: PUBLIC_TOKEN_SALE_CONTRACT, 
+      msg: {
+        buy_ticket: {
+          ticket_amount: 1
+        }
+      },
+      sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
+    },
+    {
+      gasLimit: 20_000,
+      gasPriceInFeeDenom: 100,
+      feeDenom: "uscrt",
+    }).then((response) => {
       setLoading(false)
-      alert.success('Successfully purchased!')
+      console.log(response)
+      
     }).catch((error) => {
       setLoading(false)
       alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient?.execute(): ', error)
+      console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
-  }
 
+    
+    // client?.execute(
+    //   walletAddress, // sender address
+    //   PUBLIC_TOKEN_SALE_CONTRACT, // token sale contract
+    //   { "buy": {
+    //     "denom": "ujunox",
+    //     "price": "100"
+    //   } }, // msg
+    //   defaultFee,
+    //   undefined,
+    //   [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), 'ujunox')]
+    // ).then((response) => {
+    //   setPurchaseAmount('')
+    //   setLoadedAt(new Date())
+    //   setLoading(false)
+    //   alert.success('Successfully purchased!')
+    // }).catch((error) => {
+    //   setLoading(false)
+    //   alert.error(`Error! ${error.message}`)
+    //   console.log('Error signingClient?.execute(): ', error)
+    // })
+  }
   return (
     <WalletLoader loading={loading}>
       {balance && (
