@@ -56,7 +56,7 @@ export const connectKeplr = async () => {
           bip44: {
             // You can only set the coin type of BIP44.
             // 'Purpose' is fixed to 44.
-            coinType: 118,
+            coinType: 529,
           },
           // Bech32 configuration to show the address to user.
           bech32Config: {
@@ -100,16 +100,17 @@ export const connectKeplr = async () => {
           // Ideally, it is recommended to be the same with BIP44 path's coin type.
           // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
           // So, this is separated to support such chains.
-          coinType: 118,
+          coinType: 529,
           // (Optional) This is used to set the fee of the transaction.
           // If this field is not provided, Keplr extension will set the default gas price as (low: 0.01, average: 0.025, high: 0.04).
           // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
           // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
           gasPriceStep: {
-            low: 0.01,
-            average: 0.025,
-            high: 0.04,
+            low: 0.1,
+            average: 0.25,
+            high: 0.4,
           },
+          features: ['secretwasm'],
         })
       } catch {
         alert('Failed to suggest the chain')
