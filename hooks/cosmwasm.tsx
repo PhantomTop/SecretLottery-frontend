@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { connectKeplr } from 'services/keplr'
-import { SigningCosmWasmClient, CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { SecretNetworkClient } from "secretjs"
+import { SigningCosmWasmClient, CosmWasmClient } from 'secretjs'
+// import { SecretNetworkClient } from "secretjs"
 
 export interface ISigningCosmWasmClientContext {
   walletAddress: string
-  client: SecretNetworkClient | null
+  client: CosmWasmClient | null
   signingClient: SigningCosmWasmClient | null
   loading: boolean
   error: any
@@ -13,11 +13,11 @@ export interface ISigningCosmWasmClientContext {
   disconnect: Function
 }
 
-const PUBLIC_RPC_ENDPOINT = process.env.NEXT_PUBLIC_CHAIN_RPC_ENDPOINT || ''
+const PUBLIC_REST_ENDPOINT = process.env.NEXT_PUBLIC_CHAIN_REST_ENDPOINT || ''
 const PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
 
 export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
-  const [client, setClient] = useState<SecretNetworkClient | null>(null)
+  const [client, setClient] = useState<CosmWasmClient | null>(null)
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null)
   const [walletAddress, setWalletAddress] = useState('')
@@ -37,27 +37,39 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
       const offlineSigner = await (window as any).getOfflineSigner(
         PUBLIC_CHAIN_ID
       )
+      
+      const enigmaUtils = (window as any).getEnigmaUtils(PUBLIC_CHAIN_ID)
+
       // get user address
       const [{ address }] = await offlineSigner.getAccounts()
       setWalletAddress(address)
-
+      console.log(address)
       // make client
       setClient(
-        await SecretNetworkClient.create({
-          rpcUrl: PUBLIC_RPC_ENDPOINT,
-          wallet: offlineSigner,
-          walletAddress: address,
-          chainId: PUBLIC_CHAIN_ID
-        })
+        new CosmWasmClient(PUBLIC_REST_ENDPOINT)
         // await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
       )
 
       
       // make client
       setSigningClient(
-        await SigningCosmWasmClient.connectWithSigner(
-          PUBLIC_RPC_ENDPOINT,
-          offlineSigner
+        new SigningCosmWasmClient(
+          PUBLIC_REST_ENDPOINT,
+          address,
+          offlineSigner,
+          enigmaUtils,
+          {
+            // 300k - Max gas units we're willing to use for init
+            init: {
+              amount: [{ amount: "300000", denom: "uscrt" }],
+              gas: "300000",
+            },
+            // 300k - Max gas units we're willing to use for exec
+            exec: {
+              amount: [{ amount: "300000", denom: "uscrt" }],
+              gas: "300000",
+            },
+          }
         )
       )
 
@@ -68,9 +80,9 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
   }
 
   const disconnect = () => {
-    if (signingClient) {
-      signingClient.disconnect()
-    }
+    // if (signingClient) {
+    //   signingClient.disconnect()
+    // }
     setWalletAddress('')
     setSigningClient(null)
     setLoading(false)

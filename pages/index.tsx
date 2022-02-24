@@ -10,14 +10,13 @@ import {
 import { coin } from '@cosmjs/launchpad'
 import { useAlert } from 'react-alert'
 import Emoji from 'components/Emoji'
-import { MsgSend } from 'secretjs'
 
 const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
 const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
 
 const Home: NextPage = () => {
-  const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
+  const { walletAddress, signingClient, connectWallet } = useSigningClient()
   const [balance, setBalance] = useState('')
   const [cw20Balance, setCw20Balance] = useState('')
   const [walletAmount, setWalletAmount] = useState(0)
@@ -31,22 +30,23 @@ const Home: NextPage = () => {
   const alert = useAlert()
 
   useEffect(() => {
-    if (!signingClient || !client || walletAddress.length === 0) return
+    if (!signingClient || walletAddress.length === 0) return
 
     // Gets native balance (i.e. Juno balance)
-    signingClient.getBalance(walletAddress, PUBLIC_STAKING_DENOM).then((response: any) => {
-      const { amount, denom }: { amount: number; denom: string } = response
-      setBalance(`${convertMicroDenomToDenom(amount)} ${convertFromMicroDenom(denom)}`)
-      setWalletAmount(convertMicroDenomToDenom(amount))
-    }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.getBalance(): ', error)
-    })
+    
+    // signingClient.getBalance(walletAddress, PUBLIC_STAKING_DENOM).then((response: any) => {
+    //   const { amount, denom }: { amount: number; denom: string } = response
+    //   setBalance(`${convertMicroDenomToDenom(amount)} ${convertFromMicroDenom(denom)}`)
+    //   setWalletAmount(convertMicroDenomToDenom(amount))
+    // }).catch((error) => {
+    //   alert.error(`Error! ${error.message}`)
+    //   console.log('Error signingClient.getBalance(): ', error)
+    // })
 
-    client.query.compute.queryContract({
-      address: PUBLIC_TOKEN_SALE_CONTRACT, 
-      query: {total_state: {}},
-    }).then((response) => {
+    signingClient.queryContractSmart(
+      PUBLIC_TOKEN_SALE_CONTRACT, 
+      {total_state: {}},
+    ).then((response) => {
       console.log(response)
       
     }).catch((error) => {
@@ -63,7 +63,7 @@ const Home: NextPage = () => {
     //   alert.error(`Error! ${error.message}`)
     //   console.log('Error signingClient.queryContractSmart() balance: ', error)
     // })
-  }, [signingClient, client, walletAddress, loadedAt, alert])
+  }, [signingClient, walletAddress, loadedAt, alert])
 
   // useEffect(() => {
   //   if (!signingClient) return
@@ -147,7 +147,7 @@ const Home: NextPage = () => {
   // }
 
   const handlePurchase = (event: MouseEvent<HTMLElement>) => {
-    if (!signingClient || !client || walletAddress.length === 0) return
+    if (!signingClient || walletAddress.length === 0) return
     // if (!purchaseAmount) {
     //   alert.error('Please enter the amount you would like to purchase')
     //   return
@@ -172,28 +172,23 @@ const Home: NextPage = () => {
     //   feeDenom: "uscrt",
     // });
 
-    client?.tx.compute.executeContract({
-      sender: walletAddress,
-      contract: PUBLIC_TOKEN_SALE_CONTRACT, 
-      msg: {
+    signingClient.execute(
+      PUBLIC_TOKEN_SALE_CONTRACT, 
+      {
         buy_ticket: {
           ticket_amount: 1
         }
       },
-      sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
-    },
-    {
-      gasLimit: 20_000,
-      gasPriceInFeeDenom: 100,
-      feeDenom: "uscrt",
-    }).then((response) => {
+      undefined,
+      [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
+    ).then((response) => {
       setLoading(false)
       console.log(response)
       
     }).catch((error) => {
       setLoading(false)
       alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.queryContractSmart() get_info: ', error)
+      console.log('Error signingClient.execute() buy_ticket: ', error)
     })
 
     
