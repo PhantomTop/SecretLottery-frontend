@@ -14,6 +14,7 @@ import { MsgSend } from 'secretjs'
 
 const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
+const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
 
 const Home: NextPage = () => {
@@ -45,6 +46,7 @@ const Home: NextPage = () => {
 
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT, 
+      // codeHash: PUBLIC_CODEHASH,
       query: {total_state: {}},
     }).then((response) => {
       console.log(response)
@@ -172,20 +174,35 @@ const Home: NextPage = () => {
     //   feeDenom: "uscrt",
     // });
 
-    client?.tx.compute.executeContract({
+
+    // const sSCRT = "secret1k0jntykt7e4g3y88ltc60czgjuqdy4c9e8fzek";
+    // // Get codeHash using `secretcli q compute contract-hash secret1k0jntykt7e4g3y88ltc60czgjuqdy4c9e8fzek`
+    // const sScrtCodeHash =
+    //   "af74387e276be8874f07bec3a87023ee49b0e7ebe08178c49d0a49c3c98ed60e";
+
+    // client.query.compute.queryContract({
+    //   address: sSCRT,
+    //   codeHash: sScrtCodeHash, // optional but way faster
+    //   query: { token_info: {} },
+    // }).then((response)=> {
+    //   console.log(response)
+    // }).catch((error)=> {
+    //   console.log(error)
+    // })
+
+
+    client.tx.compute.executeContract({
       sender: walletAddress,
       contract: PUBLIC_TOKEN_SALE_CONTRACT, 
+      codeHash: PUBLIC_CODEHASH,
       msg: {
-        buy_ticket: {
-          ticket_amount: 1
-        }
+        new_round: {}
       },
-      sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
+      //sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
+      sentFunds: []
     },
     {
-      gasLimit: 20_000,
-      gasPriceInFeeDenom: 100,
-      feeDenom: "uscrt",
+      gasLimit: 100_000      
     }).then((response) => {
       setLoading(false)
       console.log(response)

@@ -34,7 +34,7 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
       await (window as any).keplr.enable(PUBLIC_CHAIN_ID)
 
       // get offline signer for signing txs
-      const offlineSigner = await (window as any).getOfflineSigner(
+      const offlineSigner = await (window as any).getOfflineSignerOnlyAmino(
         PUBLIC_CHAIN_ID
       )
       // get user address
@@ -47,7 +47,8 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
           rpcUrl: PUBLIC_RPC_ENDPOINT,
           wallet: offlineSigner,
           walletAddress: address,
-          chainId: PUBLIC_CHAIN_ID
+          chainId: PUBLIC_CHAIN_ID,
+          encryptionUtils: (window as any).getEnigmaUtils(PUBLIC_CHAIN_ID)
         })
         // await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
       )
