@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 import { useSigningClient } from 'contexts/cosmwasm'
 import Loader from './Loader'
-import Emoji from './Emoji'
 
 function WalletLoader({
   children,
@@ -32,9 +31,7 @@ function WalletLoader({
           Welcome to
         </h1>
         <h1 className="mt-4 text-6xl font-bold">
-          <Emoji label="dog" symbol="🐶" />
-          <span>{' Poodle Coin Sale '}</span>
-          <Emoji label="dog" symbol="🐶" />
+          <span>{' Lottery on Secret '}</span>
         </h1>
 
         <p className="mt-6 text-2xl">
@@ -54,7 +51,6 @@ function WalletLoader({
           >
             <h3 className="text-2xl font-bold">
               <span className="pr-4">Connect your wallet &rarr;</span>
-              <Emoji label="poodle" symbol="🐩" />
             </h3>
           </button>
         </div>

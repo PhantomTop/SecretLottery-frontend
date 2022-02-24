@@ -9,8 +9,8 @@ import {
 } from 'util/conversion'
 import { coin } from '@cosmjs/launchpad'
 import { useAlert } from 'react-alert'
-import Emoji from 'components/Emoji'
 import { MsgSend } from 'secretjs'
+import moment from 'moment'
 
 const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
@@ -29,6 +29,12 @@ const Home: NextPage = () => {
   const [numToken, setNumToken] = useState(0)
   const [price, setPrice] = useState(0)
   const [showNumToken, setShowNumToken] = useState(false)
+  const [lotteryState, setLotteryState] = useState(null)
+  const [ticketCount, setTicketCount] = useState(0)
+  const [lastWinner, setLastWinner] = useState(0)
+  const [myticketCount, setMyTicketCount] = useState(0)
+  const [startTime, setStartTime] = useState<Date | null>(new Date())
+  const [endTime, setEndTime] = useState<Date | null>(new Date())
   const alert = useAlert()
 
   useEffect(() => {
@@ -44,12 +50,35 @@ const Home: NextPage = () => {
       console.log('Error signingClient.getBalance(): ', error)
     })
 
+    if (loading)
+      return
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT, 
       // codeHash: PUBLIC_CODEHASH,
       query: {total_state: {}},
     }).then((response) => {
       console.log(response)
+      setLotteryState(response.Ok)
+      setTicketCount(response.Ok.tickets.length)
+      setLastWinner(response.Ok.win_ticket)
+      setStartTime(new Date(response.Ok.start_time * 1000))
+      setEndTime(new Date((response.Ok.start_time + 604800) * 1000))
+      
+      
+    }).catch((error) => {
+      alert.error(`Error! ${error.message}`)
+      console.log('Error signingClient.queryContractSmart() get_info: ', error)
+    })
+
+    client.query.compute.queryContract({
+      address: PUBLIC_TOKEN_SALE_CONTRACT, 
+      // codeHash: PUBLIC_CODEHASH,
+      query: {tickets_of: {owner: walletAddress}},
+    }).then((response) => {
+      console.log(response)
+      setMyTicketCount(response.Ok)
+      
+      
       
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
@@ -65,7 +94,7 @@ const Home: NextPage = () => {
     //   alert.error(`Error! ${error.message}`)
     //   console.log('Error signingClient.queryContractSmart() balance: ', error)
     // })
-  }, [signingClient, client, walletAddress, loadedAt, alert])
+  }, [signingClient, client, walletAddress, loadedAt, alert, loading])
 
   // useEffect(() => {
   //   if (!signingClient) return
@@ -189,17 +218,17 @@ const Home: NextPage = () => {
     // }).catch((error)=> {
     //   console.log(error)
     // })
-
+    console.log(purchaseAmount)
 
     client.tx.compute.executeContract({
       sender: walletAddress,
       contract: PUBLIC_TOKEN_SALE_CONTRACT, 
       codeHash: PUBLIC_CODEHASH,
       msg: {
-        new_round: {}
+        "buy_ticket": {"ticket_amount": parseInt(purchaseAmount)}
       },
-      //sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
-      sentFunds: []
+      sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
+      // sentFunds: []
     },
     {
       gasLimit: 100_000      
@@ -240,24 +269,41 @@ const Home: NextPage = () => {
       {balance && (
         <p className="text-primary">
           <span>{`Your wallet has ${balance} `}</span>
-          <Emoji label="dog2" symbol="🐕" />
         </p>
       )}
 
       {cw20Balance && (
         <p className="mt-2 text-primary">
           <span>{`and ${cw20Balance} ${tokenInfo.symbol} `}</span>
-          <Emoji label="poodle" symbol="🐩" />
         </p>
+      )}
+      {lotteryState && (
+        <div>
+          <p className="mt-2 text-primary">
+            <span>{`sold ticket count : ${ticketCount}  `}</span>
+          </p>
+          <p className="mt-2 text-primary">
+            <span>{`My bought ticket count : ${myticketCount}  `}</span>
+          </p>
+          <p className="mt-2 text-primary">
+            <span>{`Winner of last round : ${lastWinner}  `}</span>
+          </p>
+          <p className="mt-2 text-primary">
+            <span>{`Start Time : `}{moment(startTime).format('YYYY/MM/DD HH:mm:ss')}</span>
+          </p>
+          <p className="mt-2 text-primary">
+            <span>{`End Time : `}{moment(endTime).format('YYYY/MM/DD HH:mm:ss')}</span>
+          </p>
+        </div>
       )}
 
       <h1 className="mt-10 text-5xl font-bold">
         Buy
       </h1>
       <h1 className="mt-4 mb-10 text-5xl font-bold">
-        <Emoji label="dog" symbol="🐶" />
+        
         <span>{` ${tokenInfo.name} `}</span>
-        <Emoji label="dog" symbol="🐶" />
+        
       </h1>
 
       <div className="form-control">
@@ -276,7 +322,7 @@ const Home: NextPage = () => {
             className="absolute top-0 right-0 rounded-l-none btn btn-lg btn-primary"
             onClick={handlePurchase}
           >
-            purchase
+            Buy
           </button>
         </div>
       </div>
@@ -286,7 +332,6 @@ const Home: NextPage = () => {
           You are getting
           <h1 className="text-3xl mt-3 text-primary">
             <span>{`${numToken} ${tokenInfo.symbol} `}</span>
-            <Emoji label="poodle" symbol="🐩" />
           </h1>
         </div>
       )}

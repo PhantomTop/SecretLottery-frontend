@@ -13,6 +13,7 @@
     "@cosmjs/cosmwasm-stargate": "^0.27.0",
     "@cosmjs/launchpad": "^0.27.0",
     "daisyui": "^1.14.0",
+    "moment": "^2.29.1",
     "next": "11.1.0",
     "react": "17.0.2",
     "react-alert": "^7.0.3",

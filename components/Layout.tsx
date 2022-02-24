@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 import Head from 'next/head'
 import Nav from './Nav'
-import Emoji from './Emoji'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -20,12 +19,11 @@ export default function Layout({ children }: { children: ReactNode }) {
         Powered by{' '}
         <a
           className="pl-1 link link-primary link-hover"
-          href="https://junochain.com"
+          href="https://cryptocrewworkshop.com"
         >
-          Juno
+          PhantomTop
         </a>
         &nbsp;
-        <Emoji label="dog2" symbol="🐕" />
       </footer>
     </div>
   )

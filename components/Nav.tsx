@@ -2,7 +2,6 @@ import { useSigningClient } from 'contexts/cosmwasm'
 import Link from 'next/link'
 import Image from 'next/image'
 import ThemeToggle from 'components/ThemeToggle'
-import Emoji from './Emoji'
 
 function Nav() {
   const { walletAddress, connectWallet, disconnect } = useSigningClient()
@@ -25,7 +24,6 @@ function Nav() {
               {/* {PUBLIC_SITE_ICON_URL.length > 0 ? (
                 <Image src={PUBLIC_SITE_ICON_URL} alt="logo" height={32} width={32} />
               ) : (
-                <Emoji label="poodle" symbol="🐩" />
               )} */}
             </a>
           </Link>
