@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+ol.item-list {
+    list-style: disc;
+}
+
+ol.item-list > li {
+    text-align: left;
+    padding: 2px 0px;
+}
+
+.list-panel {
+    width: 70%;
+    margin: 20px auto;
+}

@@ -20,15 +20,10 @@ const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
 const Home: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
   const [balance, setBalance] = useState('')
-  const [cw20Balance, setCw20Balance] = useState('')
   const [walletAmount, setWalletAmount] = useState(0)
   const [loadedAt, setLoadedAt] = useState(new Date())
   const [loading, setLoading] = useState(false)
-  const [tokenInfo, setTokenInfo] = useState({ name: '', symbol: '' })
   const [purchaseAmount, setPurchaseAmount] = useState<any>('')
-  const [numToken, setNumToken] = useState(0)
-  const [price, setPrice] = useState(0)
-  const [showNumToken, setShowNumToken] = useState(false)
   const [lotteryState, setLotteryState] = useState(null)
   const [ticketCount, setTicketCount] = useState(0)
   const [lastWinner, setLastWinner] = useState(0)
@@ -85,108 +80,15 @@ const Home: NextPage = () => {
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
-    // // Gets cw20 balance
-    // signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
-    //   balance: { address: walletAddress },
-    // }).then((response) => {
-    //   setCw20Balance(response.balance)
-    // }).catch((error) => {
-    //   alert.error(`Error! ${error.message}`)
-    //   console.log('Error signingClient.queryContractSmart() balance: ', error)
-    // })
   }, [signingClient, client, walletAddress, loadedAt, alert, loading])
-
-  // useEffect(() => {
-  //   if (!signingClient) return
-
-  //   // Gets token information
-  //   signingClient.queryContractSmart(PUBLIC_CW20_CONTRACT, {
-  //     token_info: {},
-  //   }).then((response) => {
-  //     setTokenInfo(response)
-  //   }).catch((error) => {
-  //     alert.error(`Error! ${error.message}`)
-  //     console.log('Error signingClient.queryContractSmart() token_info: ', error)
-  //   })
-  // }, [signingClient, alert])
-
-  /**
-   * Calculates and sets the number of tokens given the purchase amount divided by the price
-   */
-  //  useEffect(() => {
-  //   if (!signingClient) return
-
-  //   signingClient.queryContractSmart(PUBLIC_TOKEN_SALE_CONTRACT, {
-  //     get_info: {},
-  //   }).then((response) => {
-  //     const price  = convertMicroDenomToDenom(response.price.amount)
-  //     console.log("price : " + price) // i.e. 1 POOD token = 1000 uJUNO (micro)
-  //     setPrice(price)
-  //     setNumToken(purchaseAmount/price)
-  //   }).catch((error) => {
-  //     alert.error(`Error! ${error.message}`)
-  //     console.log('Error signingClient.queryContractSmart() get_info: ', error)
-  //   })
-
-  //   setShowNumToken(!!purchaseAmount)
-  // }, [purchaseAmount, signingClient, alert])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { target: { value } } = event
     setPurchaseAmount(value)
   }
 
-  // const handlePurchase = (event: MouseEvent<HTMLElement>) => {
-  //   if (!signingClient || walletAddress.length === 0) return
-  //   if (!purchaseAmount) {
-  //     alert.error('Please enter the amount you would like to purchase')
-  //     return
-  //   }
-  //   if (purchaseAmount > walletAmount) {
-  //     alert.error(`You do not have enough tokens to make this purchase, maximum you can spend is ${walletAmount}`)
-  //     return
-  //   }
-
-  //   event.preventDefault()
-  //   setLoading(true)
-  //   const defaultFee = {
-  //     amount: [],
-  //     gas: "400000",
-  //   };
-
-
-  //   signingClient?.execute(
-  //     walletAddress, // sender address
-  //     PUBLIC_TOKEN_SALE_CONTRACT, // token sale contract
-  //     { "buy": {
-  //       "denom": "ujunox",
-  //       "price": "100"
-  //     } }, // msg
-  //     defaultFee,
-  //     undefined,
-  //     [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), 'ujunox')]
-  //   ).then((response) => {
-  //     setPurchaseAmount('')
-  //     setLoadedAt(new Date())
-  //     setLoading(false)
-  //     alert.success('Successfully purchased!')
-  //   }).catch((error) => {
-  //     setLoading(false)
-  //     alert.error(`Error! ${error.message}`)
-  //     console.log('Error signingClient?.execute(): ', error)
-  //   })
-  // }
-
   const handlePurchase = (event: MouseEvent<HTMLElement>) => {
     if (!signingClient || !client || walletAddress.length === 0) return
-    // if (!purchaseAmount) {
-    //   alert.error('Please enter the amount you would like to purchase')
-    //   return
-    // }
-    // if (purchaseAmount > walletAmount) {
-    //   alert.error(`You do not have enough tokens to make this purchase, maximum you can spend is ${walletAmount}`)
-    //   return
-    // }
 
     event.preventDefault()
     setLoading(true)
@@ -241,28 +143,6 @@ const Home: NextPage = () => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
-
-    
-    // client?.execute(
-    //   walletAddress, // sender address
-    //   PUBLIC_TOKEN_SALE_CONTRACT, // token sale contract
-    //   { "buy": {
-    //     "denom": "ujunox",
-    //     "price": "100"
-    //   } }, // msg
-    //   defaultFee,
-    //   undefined,
-    //   [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), 'ujunox')]
-    // ).then((response) => {
-    //   setPurchaseAmount('')
-    //   setLoadedAt(new Date())
-    //   setLoading(false)
-    //   alert.success('Successfully purchased!')
-    // }).catch((error) => {
-    //   setLoading(false)
-    //   alert.error(`Error! ${error.message}`)
-    //   console.log('Error signingClient?.execute(): ', error)
-    // })
   }
   return (
     <WalletLoader loading={loading}>
@@ -272,11 +152,6 @@ const Home: NextPage = () => {
         </p>
       )}
 
-      {cw20Balance && (
-        <p className="mt-2 text-primary">
-          <span>{`and ${cw20Balance} ${tokenInfo.symbol} `}</span>
-        </p>
-      )}
       {lotteryState && (
         <div>
           <p className="mt-2 text-primary">
@@ -300,13 +175,8 @@ const Home: NextPage = () => {
       <h1 className="mt-10 text-5xl font-bold">
         Buy
       </h1>
-      <h1 className="mt-4 mb-10 text-5xl font-bold">
-        
-        <span>{` ${tokenInfo.name} `}</span>
-        
-      </h1>
 
-      <div className="form-control">
+      <div className="form-control mt-10">
         <div className="relative">
           <input
             type="number"
@@ -326,15 +196,6 @@ const Home: NextPage = () => {
           </button>
         </div>
       </div>
-
-      {showNumToken && (
-        <div className="mt-8">
-          You are getting
-          <h1 className="text-3xl mt-3 text-primary">
-            <span>{`${numToken} ${tokenInfo.symbol} `}</span>
-          </h1>
-        </div>
-      )}
     </WalletLoader>
   )
 }

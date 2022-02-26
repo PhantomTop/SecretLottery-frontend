@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import daisyuiThemes from 'styles/daisyui-themes.json'
 
 const themes = Object.keys(daisyuiThemes) || ['']
-export const defaultTheme = themes[0]
+export const defaultTheme = themes[1]
 
 function ThemeToggle() {
   const [theme, setTheme] = useState(defaultTheme)
@@ -16,7 +16,7 @@ function ThemeToggle() {
 
   return (
     <div className="form-control lg:mr-4 md:ml-auto">
-      <label className="cursor-pointer label">
+      {/* <label className="cursor-pointer label">
         <span className="label-text">🌞</span>
         <input
           type="checkbox"
@@ -30,7 +30,7 @@ function ThemeToggle() {
           readOnly
         />
         <span className="label-text">🌚</span>
-      </label>
+      </label> */}
     </div>
   )
 }
