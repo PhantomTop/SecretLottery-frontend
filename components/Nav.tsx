@@ -46,7 +46,7 @@ function Nav() {
                   </a>
                 </Link>
                 <span className="ml-1 md:ml-2">|</span>
-                <Link href="/p_winner">
+                <Link href="/prewinner">
                   <a className="ml-1 md:ml-2 link link-hover font-semibold text-ml md:text-2ml align-top">
                     Previous Winners
                   </a>

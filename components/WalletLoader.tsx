@@ -27,11 +27,8 @@ function WalletLoader({
   if (walletAddress === '') {
     return (
       <div className="max-w-full">
-        <h1 className="text-4xl font-bold">
-          Welcome to
-        </h1>
         <h1 className="mt-4 text-6xl font-bold">
-          <span>{' Lottery on Secret '}</span>
+          <span>{' SECRET WEEKLY REFFULE '}</span>
         </h1>
 
         <p className="mt-6 text-2xl">

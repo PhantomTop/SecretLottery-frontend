@@ -3,7 +3,7 @@ import WalletLoader from 'components/WalletLoader'
 import { useSigningClient } from 'contexts/cosmwasm'
 import { useEffect, useState, MouseEvent, ChangeEvent } from 'react'
 import {
-  convertMicroDenomToDenom, 
+  convertMicroDenomToDenom,
   convertDenomToMicroDenom,
   convertFromMicroDenom
 } from 'util/conversion'
@@ -25,7 +25,7 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [purchaseAmount, setPurchaseAmount] = useState<any>('')
   const [lotteryState, setLotteryState] = useState(null)
-  const [ticketCount, setTicketCount] = useState(0)
+  const [ticketCount, setTicketCount] = useState('')
   const [lastWinner, setLastWinner] = useState(0)
   const [myticketCount, setMyTicketCount] = useState(0)
   const [startTime, setStartTime] = useState<Date | null>(new Date())
@@ -48,9 +48,9 @@ const Home: NextPage = () => {
     if (loading)
       return
     client.query.compute.queryContract({
-      address: PUBLIC_TOKEN_SALE_CONTRACT, 
+      address: PUBLIC_TOKEN_SALE_CONTRACT,
       // codeHash: PUBLIC_CODEHASH,
-      query: {total_state: {}},
+      query: { total_state: {} },
     }).then((response) => {
       console.log(response)
       setLotteryState(response.Ok)
@@ -58,23 +58,20 @@ const Home: NextPage = () => {
       setLastWinner(response.Ok.win_ticket)
       setStartTime(new Date(response.Ok.start_time * 1000))
       setEndTime(new Date((response.Ok.start_time + 604800) * 1000))
-      
-      
+
+
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
     client.query.compute.queryContract({
-      address: PUBLIC_TOKEN_SALE_CONTRACT, 
+      address: PUBLIC_TOKEN_SALE_CONTRACT,
       // codeHash: PUBLIC_CODEHASH,
-      query: {tickets_of: {owner: walletAddress}},
+      query: { tickets_of: { owner: walletAddress } },
     }).then((response) => {
       console.log(response)
       setMyTicketCount(response.Ok)
-      
-      
-      
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
@@ -92,13 +89,13 @@ const Home: NextPage = () => {
 
     event.preventDefault()
     setLoading(true)
-    
+
     // const msg = new MsgSend({
     //   fromAddress: walletAddress,
     //   toAddress: bob,
     //   amount: [{ denom: "uscrt", amount: "1" }],
     // });
-    
+
     // const tx = await secretjs.tx.broadcast([msg], {
     //   gasLimit: 20_000,
     //   gasPriceInFeeDenom: 0.25,
@@ -124,76 +121,76 @@ const Home: NextPage = () => {
 
     client.tx.compute.executeContract({
       sender: walletAddress,
-      contract: PUBLIC_TOKEN_SALE_CONTRACT, 
+      contract: PUBLIC_TOKEN_SALE_CONTRACT,
       codeHash: PUBLIC_CODEHASH,
       msg: {
-        "buy_ticket": {"ticket_amount": parseInt(purchaseAmount)}
+        "buy_ticket": { "ticket_amount": parseInt(purchaseAmount) }
       },
       sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
       // sentFunds: []
     },
-    {
-      gasLimit: 100_000      
-    }).then((response) => {
-      setLoading(false)
-      console.log(response)
-      
-    }).catch((error) => {
-      setLoading(false)
-      alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.queryContractSmart() get_info: ', error)
-    })
+      {
+        gasLimit: 100_000
+      }).then((response) => {
+        setLoading(false)
+        console.log(response)
+
+      }).catch((error) => {
+        setLoading(false)
+        alert.error(`Error! ${error.message}`)
+        console.log('Error signingClient.queryContractSmart() get_info: ', error)
+      })
   }
   return (
     <WalletLoader loading={loading}>
-      {balance && (
-        <p className="text-primary">
-          <span>{`Your wallet has ${balance} `}</span>
-        </p>
-      )}
+      <div className="flex flex-col items-center justify-center">
+        {balance && (
+          <p className="text-primary">
+            <span>{`Your wallet has ${balance} `}</span>
+          </p>
+        )}
 
-      {lotteryState && (
-        <div>
-          <p className="mt-2 text-primary">
-            <span>{`sold ticket count : ${ticketCount}  `}</span>
-          </p>
-          <p className="mt-2 text-primary">
-            <span>{`My bought ticket count : ${myticketCount}  `}</span>
-          </p>
-          <p className="mt-2 text-primary">
-            <span>{`Winner of last round : ${lastWinner}  `}</span>
-          </p>
-          <p className="mt-2 text-primary">
-            <span>{`Start Time : `}{moment(startTime).format('YYYY/MM/DD HH:mm:ss')}</span>
-          </p>
-          <p className="mt-2 text-primary">
-            <span>{`End Time : `}{moment(endTime).format('YYYY/MM/DD HH:mm:ss')}</span>
-          </p>
-        </div>
-      )}
+        {lotteryState && (
+          <div>
+            <p className="mt-2 text-primary">
+              {/* <span>{`sold ticket count : ${ticketCount}  `}</span> */}
+              <span>{`Current Price : ${ticketCount} SCRT `}</span>
+            </p>
+            <p className="mt-2 text-primary">
+              <span>{`My bought ticket count : ${myticketCount}  `}</span>
+            </p>
+            <p className="mt-2 text-primary">
+              <span>{`Start Time : `}{moment(startTime).format('YYYY/MM/DD HH:mm:ss')}</span>
+            </p>
+            <p className="mt-2 text-primary">
+              <span>{`End Time : `}{moment(endTime).format('YYYY/MM/DD HH:mm:ss')}</span>
+            </p>
+          </div>
+        )}
 
-      <h1 className="mt-10 text-5xl font-bold">
-        Buy
-      </h1>
+        <h1 className="mt-10 text-5xl font-bold">
+          Buy
+        </h1>
 
-      <div className="form-control mt-10">
-        <div className="relative">
-          <input
-            type="number"
-            id="purchase-amount"
-            placeholder="Amount"
-            step="0.1"
-            className="w-full input input-lg input-primary input-bordered font-mono"
-            onChange={handleChange}
-            value={purchaseAmount}
-            style={{ paddingRight: '10rem' }}
-          /> 
-          <button
-            className="absolute top-0 right-0 rounded-l-none btn btn-lg btn-primary"
-            onClick={handlePurchase}
-          >
-            Buy
-          </button>
+        <div className="form-control mt-10">
+          <div className="relative">
+            <input
+              type="number"
+              id="purchase-amount"
+              placeholder="Amount"
+              step="0.1"
+              className="w-full input input-lg input-primary input-bordered font-mono"
+              onChange={handleChange}
+              value={purchaseAmount}
+              style={{ paddingRight: '10rem' }}
+            />
+            <button
+              className="absolute top-0 right-0 rounded-l-none btn btn-lg btn-primary"
+              onClick={handlePurchase}
+            >
+              Buy
+            </button>
+          </div>
         </div>
       </div>
     </WalletLoader>

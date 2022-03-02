@@ -10,7 +10,7 @@ const Faq: NextPage = () => {
         Raffle FAQ
       </h1>
 
-      <div className="mt-2 col">
+      <div className="mt-8 col">
         <span className="ml-1 md:ml-2 link link-hover font-semibold text-ml md:text-2ml align-top">
           Secret Raffle is a low cost of entry game of chance.
           Each week on Sunday 1600 UTC a new drawing period begins.
