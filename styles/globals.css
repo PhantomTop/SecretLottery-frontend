@@ -15,3 +15,7 @@ ol.item-list > li {
     width: 70%;
     margin: 20px auto;
 }
+
+.main-content {
+    font-size: 20px;
+}
