@@ -20,7 +20,7 @@ const Faq: NextPage = () => {
         <div className="list-panel">
           <ol className="item-list ml-6">
             <li>
-              Each ticket costs 1 $SCRT.</li>
+              Each ticket costs 1 $SCRT</li>
             <li>
               You can buy anywhere from 1 - 99 tickets
             </li>
@@ -48,7 +48,16 @@ const Faq: NextPage = () => {
             <li>
               More questions/comments?
             </li>
+
           </ol>
+        </div>
+        <div className="mt-5 text-3xl">
+          <a href="http://discord.gg/SCP22MUG5f" className="mb-2 mr-4">
+            <i className='fab fa-discord fa-2xl'></i>
+          </a>
+          <a href="http://t.me/secretraffle" className="mb-2 ml-4">
+            <i className='fab fa-telegram fa-2xl'></i>
+          </a>
         </div>
       </div>
 

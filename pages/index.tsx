@@ -16,6 +16,7 @@ const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
 const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
+const PUBLIC_REFRESH_TIME = process.env.REVRESH_INTERVAL || 60
 
 const Home: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
@@ -27,10 +28,25 @@ const Home: NextPage = () => {
   const [lotteryState, setLotteryState] = useState(null)
   const [ticketCount, setTicketCount] = useState(0)
   const [lastWinner, setLastWinner] = useState(0)
-  const [myticketCount, setMyTicketCount] = useState(0)
+  const [myticketCount, setMyTicketCount] = useState('')
   const [startTime, setStartTime] = useState<Date | null>(new Date())
   const [endTime, setEndTime] = useState<Date | null>(new Date())
+  const [refreshTime, setRefreshTime] = useState(PUBLIC_REFRESH_TIME)
   const alert = useAlert()
+
+  useEffect(() => {
+    let interval: number | NodeJS.Timer = 0;
+    if (refreshTime > 0) {
+      interval = setInterval(() => {
+        setRefreshTime(refreshTime => Number(refreshTime) - 1);
+      }, 10000);
+    } else {
+      clearInterval(interval);
+      setRefreshTime(PUBLIC_REFRESH_TIME);
+    }
+
+    return () => clearInterval(Number(interval));
+  }, [refreshTime]);
 
   useEffect(() => {
     if (!signingClient || !client || walletAddress.length === 0) return
@@ -71,13 +87,43 @@ const Home: NextPage = () => {
       query: { tickets_of: { owner: walletAddress } },
     }).then((response) => {
       console.log(response)
-      setMyTicketCount(response.Ok)
+      let res = response.Ok
+      if (res) {
+        const tickets = res.split(',')
+        let handsome = ''
+        let len = tickets.length
+        let i = 0, flag = false
+        while(i < len) {
+          if (i < len - 1 && tickets[i] == tickets[i + 1] - 1 ) {
+            if (flag) {
+              i ++;
+              continue;
+            }
+
+            handsome += tickets[i] + '-';
+            flag = true;
+            i ++;
+            continue;
+          }
+
+          if (flag)
+            flag = false;
+
+          if (i == len - 1) {
+            handsome += tickets[i];  
+          } else {
+            handsome += tickets[i] + ','
+          }
+          i ++;
+        }
+        setMyTicketCount(handsome)
+      }
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
-  }, [signingClient, client, walletAddress, loadedAt, alert, loading])
+  }, [signingClient, client, walletAddress, loadedAt, alert, loading, refreshTime])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { target: { value } } = event
@@ -157,7 +203,7 @@ const Home: NextPage = () => {
               <span>{`Current Prize : ${ticketCount} SCRT `}</span>
             </p>
             <p className="mt-2 text-primary">
-              <span>{`My bought ticket count : ${myticketCount}  `}</span>
+              <span>{`My tickets : ${myticketCount}  `}</span>
             </p>
             <p className="mt-2 text-primary">
               <span>{`Start Time : `}{moment(startTime).format('MM/DD/yyyy hh:mm:SS')}</span>

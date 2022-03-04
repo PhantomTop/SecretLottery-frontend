@@ -10,6 +10,7 @@ const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 const Faq: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
   const [lastWinner, setLastWinner] = useState(0)
+  const [lastWinnerAmount, setLastWinnerAmount] = useState(0)
   const [loading, setLoading] = useState(false)
   const alert = useAlert()
   const [lotteryState, setLotteryState] = useState(null)
@@ -27,6 +28,7 @@ const Faq: NextPage = () => {
       console.log(response)
       setLotteryState(response.Ok)
       setLastWinner(response.Ok.win_ticket)
+      setLastWinnerAmount(response.Ok.win_amount)
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
@@ -40,9 +42,12 @@ const Faq: NextPage = () => {
       </h1>
 
       {lotteryState && (
-        <div>
+        <div className="main-content">
           <p className="mt-10 text-primary">
             <span>{`Winner of last round : ${lastWinner}  `}</span>
+          </p>
+          <p className="mt-10 text-primary">
+            <span>{`Winner amount : ${lastWinnerAmount}  `}</span>
           </p>
         </div>
       )}
