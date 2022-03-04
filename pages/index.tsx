@@ -57,7 +57,7 @@ const Home: NextPage = () => {
       setBalance(`${convertMicroDenomToDenom(amount)} ${convertFromMicroDenom(denom)}`)
       setWalletAmount(convertMicroDenomToDenom(amount))
     }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
+      // alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.getBalance(): ', error)
     })
 
@@ -77,7 +77,7 @@ const Home: NextPage = () => {
 
 
     }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
+      // alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
@@ -119,7 +119,7 @@ const Home: NextPage = () => {
         setMyTicketCount(handsome)
       }
     }).catch((error) => {
-      alert.error(`Error! ${error.message}`)
+      // alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 
@@ -229,7 +229,8 @@ const Home: NextPage = () => {
               type="number"
               id="purchase-amount"
               placeholder="Number of tickets"
-              step="0.1"
+              step="1"
+              min="1"
               className="w-full input input-lg input-primary input-bordered font-mono"
               onChange={handleChange}
               value={purchaseAmount}
