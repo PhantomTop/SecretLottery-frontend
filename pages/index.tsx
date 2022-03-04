@@ -68,7 +68,7 @@ const Home: NextPage = () => {
       // codeHash: PUBLIC_CODEHASH,
       query: { total_state: {} },
     }).then((response) => {
-      console.log(response)
+      // console.log(response)
       setLotteryState(response.Ok)
       setTicketCount(response.Ok.tickets.length * 0.8)
       setLastWinner(response.Ok.win_ticket)
@@ -86,7 +86,7 @@ const Home: NextPage = () => {
       // codeHash: PUBLIC_CODEHASH,
       query: { tickets_of: { owner: walletAddress } },
     }).then((response) => {
-      console.log(response)
+      // console.log(response)
       let res = response.Ok
       if (res) {
         const tickets = res.split(',')
@@ -163,7 +163,7 @@ const Home: NextPage = () => {
     // }).catch((error)=> {
     //   console.log(error)
     // })
-    console.log(purchaseAmount)
+    // console.log(purchaseAmount)
 
     client.tx.compute.executeContract({
       sender: walletAddress,
@@ -179,7 +179,7 @@ const Home: NextPage = () => {
         gasLimit: 100_000
       }).then((response) => {
         setLoading(false)
-        console.log(response)
+        // console.log(response)
 
       }).catch((error) => {
         setLoading(false)

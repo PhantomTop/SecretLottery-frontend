@@ -52,12 +52,12 @@ const Faq: NextPage = () => {
           </ol>
         </div>
         <div className="mt-5 text-3xl">
-          <a href="http://discord.gg/SCP22MUG5f" className="mb-2 mr-4">
+          {/* <a href="https://discord.gg/SCP22MUG5f" className="mb-2 mr-4">
             <i className='fab fa-discord fa-2xl'></i>
           </a>
-          <a href="http://t.me/secretraffle" className="mb-2 ml-4">
+          <a href="https://t.me/secretraffle" className="mb-2 ml-4">
             <i className='fab fa-telegram fa-2xl'></i>
-          </a>
+          </a> */}
         </div>
       </div>
 
