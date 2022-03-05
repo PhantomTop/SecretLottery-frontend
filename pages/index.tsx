@@ -61,16 +61,16 @@ const Home: NextPage = () => {
       console.log('Error signingClient.getBalance(): ', error)
     })
 
-    if (loading)
-      return
+    // if (loading)
+    //   return
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
       // codeHash: PUBLIC_CODEHASH,
       query: { total_state: {} },
     }).then((response) => {
-      // console.log(response)
+      console.log(response)
       setLotteryState(response.Ok)
-      setTicketCount(response.Ok.tickets.length * 0.8)
+      setTicketCount(response.Ok.tickets.length * 8 / 10)
       setLastWinner(response.Ok.win_ticket)
       setStartTime(new Date(response.Ok.start_time * 1000))
       setEndTime(new Date((response.Ok.start_time + 604800) * 1000))
@@ -86,21 +86,23 @@ const Home: NextPage = () => {
       // codeHash: PUBLIC_CODEHASH,
       query: { tickets_of: { owner: walletAddress } },
     }).then((response) => {
-      // console.log(response)
+      console.log(walletAddress + ":" + response)
       let res = response.Ok
+      setMyTicketCount("")
       if (res) {
         const tickets = res.split(',')
         let handsome = ''
         let len = tickets.length
         let i = 0, flag = false
         while(i < len) {
+          let val = Number(tickets[i]) + Number(1)
           if (i < len - 1 && tickets[i] == tickets[i + 1] - 1 ) {
             if (flag) {
               i ++;
               continue;
             }
 
-            handsome += tickets[i] + '-';
+            handsome += val + '-';
             flag = true;
             i ++;
             continue;
@@ -110,9 +112,9 @@ const Home: NextPage = () => {
             flag = false;
 
           if (i == len - 1) {
-            handsome += tickets[i];  
+            handsome += val;  
           } else {
-            handsome += tickets[i] + ','
+            handsome += val + ','
           }
           i ++;
         }
@@ -120,6 +122,8 @@ const Home: NextPage = () => {
       }
     }).catch((error) => {
       // alert.error(`Error! ${error.message}`)
+      console.log("bug")
+      setMyTicketCount("")
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
 

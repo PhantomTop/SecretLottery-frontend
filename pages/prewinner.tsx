@@ -44,7 +44,7 @@ const Faq: NextPage = () => {
       {lotteryState && (
         <div className="main-content">
           <p className="mt-10 text-primary">
-            <span>{`Winner of last round : ${lastWinner}  `}</span>
+            <span>{`Winner of last round : ${lastWinner+1}  `}</span>
           </p>
           <p className="mt-10 text-primary">
             <span>{`Winner amount : ${lastWinnerAmount}  `}</span>
