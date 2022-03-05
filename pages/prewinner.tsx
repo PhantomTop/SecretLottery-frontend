@@ -11,6 +11,7 @@ const Faq: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
   const [lastWinner, setLastWinner] = useState(0)
   const [lastWinnerAmount, setLastWinnerAmount] = useState(0)
+  const [winState, setWinState] = useState(false)
   const [loading, setLoading] = useState(false)
   const alert = useAlert()
   const [lotteryState, setLotteryState] = useState(null)
@@ -29,6 +30,7 @@ const Faq: NextPage = () => {
       setLotteryState(response.Ok)
       setLastWinner(response.Ok.win_ticket)
       setLastWinnerAmount(response.Ok.win_amount)
+      setWinState(response.Ok.winner == walletAddress)
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
@@ -44,7 +46,10 @@ const Faq: NextPage = () => {
       {lotteryState && (
         <div className="main-content">
           <p className="mt-10 text-primary">
-            <span>{`Winner of last round : ${lastWinner+1}  `}</span>
+            <h2>{ winState ? `You Won!` : `You Lose!`}</h2>
+          </p>
+          <p className="mt-10 text-primary">
+            <span>{`Winner Ticket of last round : ${lastWinner+1}  `}</span>
           </p>
           <p className="mt-10 text-primary">
             <span>{`Winner amount : ${lastWinnerAmount}  `}</span>

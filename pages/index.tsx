@@ -207,7 +207,7 @@ const Home: NextPage = () => {
               <span>{`Current Prize : ${ticketCount} SCRT `}</span>
             </p>
             <p className="mt-2 text-primary">
-              <span>{`My tickets : ${myticketCount}  `}</span>
+              <span>{`My ticket IDs : ${myticketCount}  `}</span>
             </p>
             <p className="mt-2 text-primary">
               <span>{`Start Time : `}{moment(startTime).format('MM/DD/yyyy hh:mm:SS')}</span>
