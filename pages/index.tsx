@@ -11,12 +11,15 @@ import { coin } from '@cosmjs/launchpad'
 import { useAlert } from 'react-alert'
 import { MsgSend } from 'secretjs'
 import moment from 'moment'
+import DateCountdown from 'components/Timer'
 
 const PUBLIC_STAKING_DENOM = process.env.NEXT_PUBLIC_STAKING_DENOM || 'uscrt'
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
 const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 const PUBLIC_CW20_CONTRACT = process.env.NEXT_PUBLIC_CW20_CONTRACT || ''
 const PUBLIC_REFRESH_TIME = process.env.REVRESH_INTERVAL || 60
+
+
 
 const Home: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
@@ -32,6 +35,7 @@ const Home: NextPage = () => {
   const [startTime, setStartTime] = useState<Date | null>(new Date())
   const [endTime, setEndTime] = useState<Date | null>(new Date())
   const [refreshTime, setRefreshTime] = useState(PUBLIC_REFRESH_TIME)
+
   const alert = useAlert()
 
   useEffect(() => {
@@ -214,6 +218,9 @@ const Home: NextPage = () => {
             </p>
             <p className="mt-2 text-primary">
               <span>{`End Time : `}{moment(endTime).format('MM/DD/yyyy hh:mm:SS')}</span>
+            </p>
+            <p>
+              <DateCountdown dateTo={endTime}/>
             </p>
           </div>
         )}
