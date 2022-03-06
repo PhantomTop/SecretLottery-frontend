@@ -10,6 +10,7 @@ const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 const Faq: NextPage = () => {
   const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
   const [lastWinner, setLastWinner] = useState(0)
+  const [lastWinnerAddress, setLastWinnerAddress] = useState('')
   const [lastWinnerAmount, setLastWinnerAmount] = useState(0)
   const [winState, setWinState] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -30,6 +31,7 @@ const Faq: NextPage = () => {
       setLotteryState(response.Ok)
       setLastWinner(response.Ok.win_ticket)
       setLastWinnerAmount(response.Ok.win_amount)
+      setLastWinnerAddress(response.Ok.winner)
       setWinState(response.Ok.winner == walletAddress)
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
@@ -47,6 +49,9 @@ const Faq: NextPage = () => {
         <div className="main-content">
           <p className="mt-10 text-primary">
             <h2>{ winState ? `You Won!` : `You Lose!`}</h2>
+          </p>
+          <p className="mt-10 text-primary">
+            <span>{`Winner of last round : ${lastWinnerAddress}  `}</span>
           </p>
           <p className="mt-10 text-primary">
             <span>{`Winner Ticket of last round : ${lastWinner+1}  `}</span>
