@@ -70,7 +70,7 @@ const Home: NextPage = () => {
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
       // codeHash: PUBLIC_CODEHASH,
-      query: { total_state: {} },
+      query: { "total_state": {} },
     }).then((response) => {
       console.log(response)
       setLotteryState(response.Ok)
@@ -82,15 +82,16 @@ const Home: NextPage = () => {
 
     }).catch((error) => {
       // alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.queryContractSmart() get_info: ', error)
+      console.log('Error signingClient.queryContractSmart() total_state: ', error)
     })
 
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
       // codeHash: PUBLIC_CODEHASH,
-      query: { tickets_of: { owner: walletAddress } },
+      query: { "tickets_of": { owner: walletAddress } },
     }).then((response) => {
-      console.log(walletAddress + ":" + response)
+      console.log("tickets of response")
+      console.log(response)
       let res = response.Ok
       setMyTicketCount("")
       if (res) {
@@ -128,7 +129,7 @@ const Home: NextPage = () => {
       // alert.error(`Error! ${error.message}`)
       console.log("bug")
       setMyTicketCount("")
-      console.log('Error signingClient.queryContractSmart() get_info: ', error)
+      console.log('Error signingClient.queryContractSmart() tickets_of: ', error)
     })
 
   }, [signingClient, client, walletAddress, loadedAt, alert, loading, refreshTime])
@@ -192,7 +193,7 @@ const Home: NextPage = () => {
       }).catch((error) => {
         setLoading(false)
         alert.error(`Error! ${error.message}`)
-        console.log('Error signingClient.queryContractSmart() get_info: ', error)
+        console.log('Error signingClient.executeContract() buy_ticket: ', error)
       })
   }
   return (
@@ -219,7 +220,8 @@ const Home: NextPage = () => {
             <p className="mt-2 text-primary">
               <span>{`End Time : `}{moment(endTime).format('MM/DD/yyyy hh:mm:SS')}</span>
             </p>
-            <p>
+            <p >
+
               <DateCountdown dateTo={endTime}/>
             </p>
           </div>

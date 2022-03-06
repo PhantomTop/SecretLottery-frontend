@@ -39,11 +39,11 @@ const Timer = (props:any) => {
         <div>
         { minutes === 0 && seconds === 0 && hours === 0 && days === 0
             ? null
-            : <h1> 
+            : <h1 className="mt-10 text-4xl font-bold"> 
                 {days < 10 ?  `0${days}` : days} day 
                 {' '}{hours < 10 ?  `0${hours}` : hours} hour 
                 {' '}{minutes < 10 ?  `0${minutes}` : minutes} min 
-                {' '}{seconds < 10 ?  `0${seconds}` : seconds} sec
+                {' '}{seconds < 10 ?  `0${seconds}` : seconds} sec Left 
             </h1> 
         }
         </div>
