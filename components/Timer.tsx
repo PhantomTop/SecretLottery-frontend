@@ -43,10 +43,15 @@ const Timer = (props:any) => {
             ? null
             : <h1 > 
                 {leftSecond >= 0? `Time until next drawing` : `Round end`}<br/>
+                {leftSecond >= 0 ?
+                <>
                 {days < 10 ?  `0${days}` : days} day 
                 {' '}{hours < 10 ?  `0${hours}` : hours} hour 
                 {' '}{minutes < 10 ?  `0${minutes}` : minutes} min 
                 {' '}{seconds < 10 ?  `0${seconds}` : seconds} sec Left 
+                </>:<></>
+                }
+                
             </h1> 
         }
         </div>

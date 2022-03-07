@@ -188,7 +188,7 @@ const Home: NextPage = () => {
         gasLimit: 100_000
       }).then((response) => {
         setLoading(false)
-        console.log(response.rawLog)
+        // console.log(response.rawLog)
         if (response.rawLog.charAt(0) == 'f')
           alert.info(response.rawLog)
 
