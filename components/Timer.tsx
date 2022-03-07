@@ -24,6 +24,8 @@ const Timer = (props:any) => {
             // console.log(leftSecond)
             // console.log(leftSecond / 86400)
             // console.log(Math.floor(leftSecond / 86400))
+            if (leftSecond <= 0)
+                return;
             setDays(Math.floor(leftSecond / 86400))
             setHours(Math.floor(leftSecond / 3600) % 24)
             setMinutes(Math.floor(leftSecond / 60) % 60)
@@ -39,7 +41,8 @@ const Timer = (props:any) => {
         <div>
         { minutes === 0 && seconds === 0 && hours === 0 && days === 0
             ? null
-            : <h1 className="mt-10 text-4xl font-bold"> 
+            : <h1 > 
+                {leftSecond >= 0? `Time until next drawing` : `Round end`}<br/>
                 {days < 10 ?  `0${days}` : days} day 
                 {' '}{hours < 10 ?  `0${hours}` : hours} hour 
                 {' '}{minutes < 10 ?  `0${minutes}` : minutes} min 

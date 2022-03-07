@@ -188,7 +188,9 @@ const Home: NextPage = () => {
         gasLimit: 100_000
       }).then((response) => {
         setLoading(false)
-        // console.log(response)
+        console.log(response.rawLog)
+        if (response.rawLog.charAt(0) == 'f')
+          alert.info(response.rawLog)
 
       }).catch((error) => {
         setLoading(false)
@@ -220,8 +222,8 @@ const Home: NextPage = () => {
             <p className="mt-2 text-primary">
               <span>{`End Time : `}{moment(endTime).format('MM/DD/yyyy hh:mm:SS')}</span>
             </p>
-            <p >
-
+            <p className="mt-2 text-3xl font-bold">
+              
               <DateCountdown dateTo={endTime}/>
             </p>
           </div>
