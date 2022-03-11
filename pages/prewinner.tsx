@@ -29,7 +29,7 @@ const Faq: NextPage = () => {
       return
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
-      // codeHash: PUBLIC_CODEHASH,
+      codeHash: PUBLIC_CODEHASH,
       query: { total_state: {} },
     }).then((response) => {
       console.log(response)
