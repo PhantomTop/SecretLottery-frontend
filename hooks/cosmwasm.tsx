@@ -66,12 +66,12 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
       
       
       // make client
-      setSigningClient(
-        await SigningCosmWasmClient.connectWithSigner(
-          PUBLIC_RPC_ENDPOINT,
-          offlineSigner
-        )
-      )
+      // setSigningClient(
+      //   await SigningCosmWasmClient.connectWithSigner(
+      //     PUBLIC_RPC_ENDPOINT,
+      //     offlineSigner
+      //   )
+      // )
 
       setLoading(false)
     } catch (error:any) {

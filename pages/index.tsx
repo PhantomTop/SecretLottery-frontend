@@ -53,7 +53,7 @@ const Home: NextPage = () => {
   }, [refreshTime]);
 
   useEffect(() => {
-    if (!signingClient || !client || walletAddress.length === 0) return
+    if ( !client || walletAddress.length === 0) return
 
     // Gets native balance (i.e. Juno balance)
     
@@ -137,7 +137,7 @@ const Home: NextPage = () => {
       console.log('Error client.queryContractSmart() tickets_of: ', error)
     })
 
-  }, [signingClient, client, walletAddress, loadedAt, alert, loading, refreshTime])
+  }, [client, walletAddress, loadedAt, alert, loading, refreshTime])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { target: { value } } = event
@@ -145,7 +145,7 @@ const Home: NextPage = () => {
   }
 
   const handlePurchase = (event: MouseEvent<HTMLElement>) => {
-    if (!signingClient || !client || walletAddress.length === 0) return
+    if (!client || walletAddress.length === 0) return
 
     event.preventDefault()
     setLoading(true)
