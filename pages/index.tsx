@@ -56,20 +56,25 @@ const Home: NextPage = () => {
     if (!signingClient || !client || walletAddress.length === 0) return
 
     // Gets native balance (i.e. Juno balance)
-    signingClient.getBalance(walletAddress, PUBLIC_STAKING_DENOM).then((response: any) => {
-      const { amount, denom }: { amount: number; denom: string } = response
-      setBalance(`${convertMicroDenomToDenom(amount)} ${convertFromMicroDenom(denom)}`)
+    
+    client.query.bank.balance({
+      address: walletAddress,
+      denom: "uscrt",
+    }).then((response: any) => {
+      console.log(response)
+      const { amount, denom}: { amount: number , denom:string} = response.balance
+      setBalance(`${convertMicroDenomToDenom(amount)} ${convertFromMicroDenom("uscrt")}`)
       setWalletAmount(convertMicroDenomToDenom(amount))
     }).catch((error) => {
       // alert.error(`Error! ${error.message}`)
-      console.log('Error signingClient.getBalance(): ', error)
+      console.log('Error client.query.bank.balance(): ', error)
     })
 
     // if (loading)
     //   return
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
-      // codeHash: PUBLIC_CODEHASH,
+      codeHash: PUBLIC_CODEHASH,
       query: { "total_state": {} },
     }).then((response) => {
       console.log(response)
@@ -87,7 +92,7 @@ const Home: NextPage = () => {
 
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
-      // codeHash: PUBLIC_CODEHASH,
+      codeHash: PUBLIC_CODEHASH,
       query: { "tickets_of": { owner: walletAddress } },
     }).then((response) => {
       console.log("tickets of response")
@@ -129,7 +134,7 @@ const Home: NextPage = () => {
       // alert.error(`Error! ${error.message}`)
       console.log("bug")
       setMyTicketCount("")
-      console.log('Error signingClient.queryContractSmart() tickets_of: ', error)
+      console.log('Error client.queryContractSmart() tickets_of: ', error)
     })
 
   }, [signingClient, client, walletAddress, loadedAt, alert, loading, refreshTime])
@@ -179,24 +184,24 @@ const Home: NextPage = () => {
       contract: PUBLIC_TOKEN_SALE_CONTRACT,
       codeHash: PUBLIC_CODEHASH,
       msg: {
-        "buy_ticket": { "ticket_amount": parseInt(purchaseAmount) }
+        buy_ticket: { ticket_amount: parseInt(purchaseAmount) }
       },
       sentFunds: [coin(parseInt(convertDenomToMicroDenom(purchaseAmount), 10), "uscrt")]
       // sentFunds: []
     },
-      {
-        gasLimit: 100_000
-      }).then((response) => {
-        setLoading(false)
-        // console.log(response.rawLog)
-        if (response.rawLog.charAt(0) == 'f')
-          alert.info(response.rawLog)
+    {
+      gasLimit: 100_000
+    }).then((response) => {
+      setLoading(false)
+      // console.log(response.rawLog)
+      if (response.rawLog.charAt(0) == 'f')
+        alert.info(response.rawLog)
 
-      }).catch((error) => {
-        setLoading(false)
-        alert.error(`Error! ${error.message}`)
-        console.log('Error signingClient.executeContract() buy_ticket: ', error)
-      })
+    }).catch((error) => {
+      setLoading(false)
+      alert.error(`Buy Error! ${error.message}`)
+      console.log('Error signingClient.executeContract() buy_ticket: ', error)
+    })
   }
   return (
     <WalletLoader loading={loading}>

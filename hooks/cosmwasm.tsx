@@ -42,17 +42,28 @@ export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {
       setWalletAddress(address)
 
       // make client
-      setClient(
+      // setClient(
+      //   await SecretNetworkClient.create({
+      //     rpcUrl: PUBLIC_RPC_ENDPOINT,
+      //     wallet: offlineSigner,
+      //     walletAddress: address,
+      //     chainId: PUBLIC_CHAIN_ID,
+      //     encryptionUtils: (window as any).getEnigmaUtils(PUBLIC_CHAIN_ID)
+      //   })
+      //   // await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
+      // )
+
+      setClient( 
         await SecretNetworkClient.create({
-          rpcUrl: PUBLIC_RPC_ENDPOINT,
+          grpcWebUrl: "https://grpc-web.azure-api.net",
           wallet: offlineSigner,
           walletAddress: address,
           chainId: PUBLIC_CHAIN_ID,
-          encryptionUtils: (window as any).getEnigmaUtils(PUBLIC_CHAIN_ID)
+          // encryptionUtils: (window as any).getEnigmaUtils(PUBLIC_CHAIN_ID)
         })
-        // await CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
       )
 
+      
       
       // make client
       setSigningClient(
