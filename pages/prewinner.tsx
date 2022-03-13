@@ -13,7 +13,7 @@ const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT |
 const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
 
 const Faq: NextPage = () => {
-  const { walletAddress, signingClient, client, connectWallet } = useSigningClient()
+  const { walletAddress, client, connectWallet } = useSigningClient()
   const [lastWinner, setLastWinner] = useState(0)
   const [lastWinnerAddress, setLastWinnerAddress] = useState('')
   const [lastWinnerAmount, setLastWinnerAmount] = useState(0)
@@ -23,14 +23,14 @@ const Faq: NextPage = () => {
   const [lotteryState, setLotteryState] = useState(null)
 
   useEffect(() => {
-    if (!signingClient || !client || walletAddress.length === 0) return
+    if (!client || walletAddress.length === 0) return
 
     if (loading)
       return
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
       codeHash: PUBLIC_CODEHASH,
-      query: { total_state: {} },
+      query: { "total_state": {} },
     }).then((response) => {
       console.log(response)
       setLotteryState(response.Ok)
@@ -42,7 +42,7 @@ const Faq: NextPage = () => {
       alert.error(`Error! ${error.message}`)
       console.log('Error signingClient.queryContractSmart() get_info: ', error)
     })
-  }, [signingClient, client, walletAddress, alert, loading])
+  }, [ client, walletAddress, alert, loading])
 
   return (
     <WalletLoader loading={loading}>
