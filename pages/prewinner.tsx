@@ -20,7 +20,7 @@ const Faq: NextPage = () => {
   const [winState, setWinState] = useState(false)
   const [loading, setLoading] = useState(false)
   const alert = useAlert()
-  const [lotteryState, setLotteryState] = useState(null)
+  const [histories, setHistories] = useState([{end_time:Number, ticket:Number, address:String, amount:Number}])
 
   useEffect(() => {
     if (!client || walletAddress.length === 0) return
@@ -30,13 +30,11 @@ const Faq: NextPage = () => {
     client.query.compute.queryContract({
       address: PUBLIC_TOKEN_SALE_CONTRACT,
       codeHash: PUBLIC_CODEHASH,
-      query: { "total_state": {} },
+      query: { "histories": {} },
     }).then((response) => {
       console.log(response)
-      setLotteryState(response.Ok)
-      setLastWinner(response.Ok.win_ticket)
-      setLastWinnerAmount(response.Ok.win_amount)
-      setLastWinnerAddress(response.Ok.winner)
+      setHistories(response.Ok.histories)
+      
       setWinState(response.Ok.winner == walletAddress)
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
@@ -49,23 +47,25 @@ const Faq: NextPage = () => {
       <h1 className="text-5xl font-bold">
         Previous Winner
       </h1>
-
-      {lotteryState && (
+      <div>
+      {histories?.map((data)=> (
+        
         <div className="main-content">
           <p className="mt-10 text-primary">
-            <h2>{ winState ? `You Won!` : `You Lose!`}</h2>
+            <h2>{ data.address.toString() == walletAddress ? `You Won!` : `You Lose!`}</h2>
           </p>
           <p className="mt-10 text-primary">
-            <span>{`Winner of last round : ${lastWinnerAddress}  `}</span>
+            <span>{`Winner : ${data.address.toString()}  `}</span>
           </p>
           <p className="mt-10 text-primary">
-            <span>{`Winner Ticket of last round : ${lastWinner+1}  `}</span>
+            <span>{`Ticket Number : ${Number(data.ticket) + 1}  `}</span>
           </p>
           <p className="mt-10 text-primary">
-            <span>{`Winner amount : ${convertMicroDenomToDenom(lastWinnerAmount)} SCRT `}</span>
+            <span>{`Winner amount : ${convertMicroDenomToDenom(Number(data.amount))} SCRT `}</span>
           </p>
         </div>
-      )}
+      ))}
+      </div>
     </WalletLoader>
   )
 }
