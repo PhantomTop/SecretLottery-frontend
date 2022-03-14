@@ -35,9 +35,10 @@ const Faq: NextPage = () => {
     }).then((response) => {
       console.log(response)
       
-      let temp = response.Ok.histories
-      // for (let i = 0; i < 100; i ++)
-      //   temp.push(response.Ok.histories[0])
+      let temp = []
+
+      for (let i = response.Ok.histories.length - 1; i >= 0; i --)
+        temp.push(response.Ok.histories[i])
       setHistories(temp)
       setWinState(response.Ok.winner == walletAddress)
     }).catch((error) => {
