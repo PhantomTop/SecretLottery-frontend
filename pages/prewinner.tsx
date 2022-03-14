@@ -54,11 +54,11 @@ const Faq: NextPage = () => {
       <div style={{
         width: "1000px",
         height:"500px",
-        overflowY:"scroll"
+        overflowY:"auto"
       }}>
       {histories?.map((data)=> (
         
-        <div className="main-content">
+        <div className="main-content" key={Number(data.end_time)}>
           <p className="mt-10 text-primary">
             {/* <h2>{ data.address.toString() == walletAddress ? `You Won!` : `You Lose!`}</h2> */}
             <span>{moment(Number(data.end_time) * 1000).format('MM/DD/yyyy')}</span><br/>
