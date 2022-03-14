@@ -8,6 +8,7 @@ import {
   convertDenomToMicroDenom,
   convertFromMicroDenom
 } from 'util/conversion'
+import moment from 'moment'
 
 const PUBLIC_TOKEN_SALE_CONTRACT = process.env.NEXT_PUBLIC_TOKEN_SALE_CONTRACT || ''
 const PUBLIC_CODEHASH = process.env.NEXT_PUBLIC_CODEHASH || ''
@@ -33,8 +34,11 @@ const Faq: NextPage = () => {
       query: { "histories": {} },
     }).then((response) => {
       console.log(response)
-      setHistories(response.Ok.histories)
       
+      let temp = response.Ok.histories
+      // for (let i = 0; i < 100; i ++)
+      //   temp.push(response.Ok.histories[0])
+      setHistories(temp)
       setWinState(response.Ok.winner == walletAddress)
     }).catch((error) => {
       alert.error(`Error! ${error.message}`)
@@ -43,26 +47,25 @@ const Faq: NextPage = () => {
   }, [ client, walletAddress, alert, loading])
 
   return (
-    <WalletLoader loading={loading}>
+    <WalletLoader loading={loading} >
       <h1 className="text-5xl font-bold">
         Previous Winner
       </h1>
-      <div>
+      <div style={{
+        width: "1000px",
+        height:"500px",
+        overflowY:"scroll"
+      }}>
       {histories?.map((data)=> (
         
         <div className="main-content">
           <p className="mt-10 text-primary">
-            <h2>{ data.address.toString() == walletAddress ? `You Won!` : `You Lose!`}</h2>
+            {/* <h2>{ data.address.toString() == walletAddress ? `You Won!` : `You Lose!`}</h2> */}
+            <span>{moment(Number(data.end_time) * 1000).format('MM/DD/yyyy')}</span><br/>
+            <span>{`Winning Ticket: #${Number(data.ticket) + 1}, ${data.address.toString()}  `}</span><br/>
+            <span>{`Prize : ${convertMicroDenomToDenom(Number(data.amount))} SCRT `}</span>
           </p>
-          <p className="mt-10 text-primary">
-            <span>{`Winner : ${data.address.toString()}  `}</span>
-          </p>
-          <p className="mt-10 text-primary">
-            <span>{`Ticket Number : ${Number(data.ticket) + 1}  `}</span>
-          </p>
-          <p className="mt-10 text-primary">
-            <span>{`Winner amount : ${convertMicroDenomToDenom(Number(data.amount))} SCRT `}</span>
-          </p>
+          
         </div>
       ))}
       </div>
