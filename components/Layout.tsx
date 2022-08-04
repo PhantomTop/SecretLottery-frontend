@@ -25,12 +25,12 @@ export default function Layout({ children }: { children: ReactNode }) {
           CryptooPegasus
         </a>
         &nbsp; */}
-        <a href="https://discord.gg/SCP22MUG5f" className="mb-0 mr-4">
+        {/* <a href="https://discord.gg/SCP22MUG5f" className="mb-0 mr-4">
             <i className='fab fa-discord fa-3x'></i>
           </a>
           <a href="https://t.me/secretraffle" className="mb-0 ml-4">
             <i className='fab fa-telegram fa-3x'></i>
-          </a>
+          </a> */}
       </footer>
     </div>
   )
